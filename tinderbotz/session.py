@@ -32,9 +32,9 @@ from tinderbotz.helpers.constants_helper import Printouts
 from tinderbotz.helpers.xpaths import *
 from tinderbotz.addproxy import get_proxy_extension
 
-# from xvfbwrapper import Xvfb
-# vdisplay = Xvfb(width=800, height=1280)
-# vdisplay.start()
+from xvfbwrapper import Xvfb
+vdisplay = Xvfb(width=800, height=1280)
+vdisplay.start()
 
 class Session:
     HOME_URL = "https://www.tinder.com/app/recs"
@@ -115,7 +115,10 @@ class Session:
 
         # Getting the chromedriver from cache or download it from internet
         print("Getting ChromeDriver ...")
+
+        
         # uc.ChromeDriverManager().install()
+        # self.browser = uc.Chrome(options=options, driver_executable_path = latest_chromedriver)  # ChromeDriverManager().install(),
         self.browser = uc.Chrome(options=options)  # ChromeDriverManager().install(),
         # self.browser = webdriver.Chrome(options=options)
         # self.browser.set_window_size(1250, 750)
@@ -218,7 +221,7 @@ class Session:
         # store its userdata
         StorageHelper.store_match(match=match, directory='data/{}'.format(filename), filename=filename)
 
-    def like(self, amount=1, ratio='100%', sleep=1, randomize_sleep = True):
+    def like(self, amount=1, ratio='72.5%', sleep=1, randomize_sleep = True):
         
         initial_sleep = sleep
         ratio = float(ratio.split('%')[0]) / 100
@@ -228,11 +231,17 @@ class Session:
             amount_liked = 0
             # handle one time up front, from then on check after every action instead of before
             self._handle_potential_popups()
+            # time.sleep(10)
             print("\nLiking profiles started.")
             while amount_liked < amount:
                 # randomize sleep
+                if amount_liked % 50 == 0 and amount_liked > 0:
+                    print("Sleeping for 40 minutes to avoid being banned...")
+                    time.sleep(2400)
+                    
                 if randomize_sleep:
                     sleep = random.uniform(0.5, 2.3) * initial_sleep
+                
                 if random.random() <= ratio:
                     if helper.like():
                         amount_liked += 1

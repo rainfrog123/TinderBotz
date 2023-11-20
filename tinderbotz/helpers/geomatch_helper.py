@@ -11,7 +11,7 @@ from datetime import datetime
 
 class GeomatchHelper:
 
-    delay = 5
+    delay = 100
 
     HOME_URL = "https://www.tinder.com/app/recs"
 
@@ -20,7 +20,7 @@ class GeomatchHelper:
         if "/app/recs" not in self.browser.current_url:
             self._get_home_page()
 
-    def like(self)->bool:
+    def like(self) -> bool:
         try:
             # need to find better way
             #if 'profile' in self.browser.current_url:
@@ -45,13 +45,46 @@ class GeomatchHelper:
 
             #    action = ActionChains(self.browser)
            #    action.drag_and_drop_by_offset(card, 200, 0).perform()
+            xpath = '//*[@id="s-547617529"]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div/div[3]/div/div[4]'
 
-            action = ActionChains(self.browser)
-            action.send_keys(Keys.ARROW_RIGHT).perform()
-            #time.sleep(1)
+
+            selector_path = '#s-547617529 > div > div.App__body.H\(100\%\).Pos\(r\).Z\(0\) > div > main > div.H\(100\%\) > div > div > div.Mt\(a\).Px\(4px\)--s.Pos\(r\).Expand.H\(--recs-card-height\)--ml.Maw\(--recs-card-width\)--ml > div.recsCardboard__cardsContainer.H\(100\%\).Pos\(r\).Z\(1\) > div > div.Pos\(a\).B\(0\).Iso\(i\).W\(100\%\).Start\(0\).End\(0\) > div > div.Mx\(a\).Fxs\(0\).Sq\(70px\).Sq\(60px\)--s.Bd.Bdrs\(50\%\).Bdc\(\$c-ds-border-gamepad-like-default\)'
+            # WebDriverWait(self.browser, self.delay).until(EC.presence_of_element_located((By.XPATH, xpath)))  
+            WebDriverWait(self.browser, self.delay).until(EC.presence_of_element_located((By.CSS_SELECTOR, selector_path)))  
+
+            # like_button = self.browser.find_element(By.XPATH, xpath)
+            like_button = self.browser.find_element(By.CSS_SELECTOR, selector_path)
+            like_button.click()  
+
+            # action = ActionChains(self.browser)
+            # action.send_keys(Keys.ARROW_RIGHT).perform()
+
+            # #time.sleep(1)
             return True
+        
+        # except TimeoutException:
+        #     print(f'No more profiles to like. Waiting 2 hours before trying again at {datetime.now()}')
+        #     time.sleep(7200)
 
-        except (TimeoutException, ElementClickInterceptedException):
+        except ElementClickInterceptedException:
+            print(f'{datetime.now()} - ElementClickInterceptedException')
+            self._get_home_page()
+        
+        except TimeoutException:
+            print(f'{datetime.now()} - TimeoutException')
+
+            try:
+                self._get_home_page()
+                WebDriverWait(self.browser, self.delay).until(EC.presence_of_element_located((By.CSS_SELECTOR, selector_path)))
+            except TimeoutException:
+                print(f'Consecutive timeouts. Waiting 2 hours before trying again at {datetime.now()}')
+                time.sleep(60 * 60 * 2)
+                # self._get_home_page()
+
+
+        except Exception as e:
+            print(f'{datetime.now()} - Exception')
+            print(e)
             self._get_home_page()
 
         return False
