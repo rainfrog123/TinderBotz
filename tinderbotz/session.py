@@ -1,7 +1,7 @@
 # Selenium: automation of browser
 from selenium import webdriver
 # from webdriver_manager.chrome import ChromeDriverManager
-import undetected_chromedriver.v2 as uc
+import undetected_chromedriver as uc
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
@@ -32,6 +32,9 @@ from tinderbotz.helpers.constants_helper import Printouts
 from tinderbotz.helpers.xpaths import *
 from tinderbotz.addproxy import get_proxy_extension
 
+# from xvfbwrapper import Xvfb
+# vdisplay = Xvfb(width=800, height=1280)
+# vdisplay.start()
 
 class Session:
     HOME_URL = "https://www.tinder.com/app/recs"
@@ -112,6 +115,7 @@ class Session:
 
         # Getting the chromedriver from cache or download it from internet
         print("Getting ChromeDriver ...")
+        # uc.ChromeDriverManager().install()
         self.browser = uc.Chrome(options=options)  # ChromeDriverManager().install(),
         # self.browser = webdriver.Chrome(options=options)
         # self.browser.set_window_size(1250, 750)

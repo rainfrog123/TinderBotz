@@ -14,17 +14,17 @@ if __name__ == "__main__":
     # session = Session(proxy="23.23.23.23:3128")
 
     # set location (Don't need to be logged in for this)
-    session.set_custom_location(latitude=50.879829, longitude=4.700540)
+    # session.set_custom_location(latitude=50.879829, longitude=4.700540)
     
     # replace this with your own email and password!
-    email = "example@gmail.com"
-    password = "password123"
+    # email = "example@gmail.com"
+    # password = "password123"
     
-    # login using your google account with a verified email!
-    session.login_using_google(email, password)
+    # # login using your google account with a verified email!
+    # session.login_using_google(email, password)
 
-    # Alternatively you can login using facebook with a connected profile!
-    session.login_using_facebook(email, password)
+    # # Alternatively you can login using facebook with a connected profile!
+    # session.login_using_facebook(email, password)
 
     # Alternatively, you can also use your phone number to login
     '''
@@ -32,8 +32,8 @@ if __name__ == "__main__":
     - phone_number is everything after the prefix (+32)
     NOTE: this is not my phone number :)
     '''
-    country = "Belgium"
-    phone_number = "479011124"
+    country = "China"
+    phone_number = "13882985188"
     session.login_using_sms(country, phone_number)
 
     # spam likes, dislikes and superlikes
@@ -47,16 +47,16 @@ if __name__ == "__main__":
     
     # adjust allowed distance for geomatches
     # Note: PARAMETER IS IN KILOMETERS!
-    session.set_distance_range(km=150)
+    # session.set_distance_range(km=150)
 
-    # set range of prefered age
-    session.set_age_range(18, 55)
+    # # set range of prefered age
+    # session.set_age_range(18, 55)
 
-    # set interested in gender(s) -> options are: WOMEN, MEN, EVERYONE
-    session.set_sexuality(Sexuality.WOMEN)
+    # # set interested in gender(s) -> options are: WOMEN, MEN, EVERYONE
+    # session.set_sexuality(Sexuality.WOMEN)
 
-    # Allow profiles from all over the world to appear
-    session.set_global(True)
+    # # Allow profiles from all over the world to appear
+    # session.set_global(True)
 
     # Getting matches takes a while, so recommended you load as much as possible from local storage
     # get new matches, with whom you haven't interacted yet
