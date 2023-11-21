@@ -12,5 +12,5 @@ if __name__ == "__main__":
     
     # session.set_custom_location(latitude=50.879829, longitude=4.700540)
 
-    session.like(amount=5000000, ratio="97%", sleep=4)
+    session.like(amount=5000000, ratio="90%", sleep=1)
 

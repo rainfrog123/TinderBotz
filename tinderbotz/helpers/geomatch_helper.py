@@ -9,29 +9,66 @@ import re
 from tinderbotz.helpers.xpaths import content
 from datetime import datetime
 
+photo_verified_path = '#catalog-page > section:nth-child(1) > section > div > div > span > section > div > div > div.Pos\(a\).Start\(0\).End\(0\).B\(0\).H\(40\%\).Bgi\(\$g-ds-overlay-card\).P\(8px\).D\(f\).Ai\(fe\).Jc\(sb\) > div > button'
+
+
 class GeomatchHelper:
 
     delay = 100
 
     HOME_URL = "https://www.tinder.com/app/recs"
+    EXPLORE_URL = 'https://www.tinder.com/app/explore'
 
+    EXPLORE_LIKE_CARDS = [{'Photo_Verified':'#catalog-page > section:nth-child(1) > section > div > div > span > section'},
+                          
+                           {'Looking_for_Love':'#catalog-page > section:nth-child(2) > section > div > section:nth-child(1)'},
+                           {'Free_Tonight':'#catalog-page > section:nth-child(2) > section > div > section:nth-child(2)'},
+                            {'Lets_be_Friends':'#catalog-page > section:nth-child(2) > section > div > section:nth-child(3)'},
+                            {'Coffee_Dates':'#catalog-page > section:nth-child(2) > section > div > section:nth-child(4)'},
+                            {'Music_Mode':'#catalog-page > section:nth-child(2) > section > div > section:nth-child(5)'},
+
+                            {'Date_Night':'#catalog-page > section:nth-child(3) > section > div > section:nth-child(1)'},
+                            {'Binge_Watchers':'#catalog-page > section:nth-child(3) > section > div > section:nth-child(2)'},
+                            {'Creatives':'#catalog-page > section:nth-child(3) > section > div > section:nth-child(3)'},
+                            {'Sporty':'#catalog-page > section:nth-child(3) > section > div > section:nth-child(4)'},
+                            {'Music_Lovers':'#catalog-page > section:nth-child(3) > section > div > section:nth-child(5)'},
+                            {'Foodies':'#catalog-page > section:nth-child(3) > section > div > section:nth-child(6)'},
+                            {'Nature_Lovers':'#catalog-page > section:nth-child(3) > section > div > section:nth-child(7)'},
+                            {'Travel':'#catalog-page > section:nth-child(3) > section > div > section:nth-child(8)'},
+                            {'Self_Care':'#catalog-page > section:nth-child(3) > section > div > section:nth-child(9)'},
+                            {'Thrill_Seekers':'#catalog-page > section:nth-child(3) > section > div > section:nth-child(10)'},
+                            {'Gamers':'#catalog-page > section:nth-child(3) > section > div > section:nth-child(11)'},
+                            {'Animal_Parents':'#catalog-page > section:nth-child(3) > section > div > section:nth-child(12)'},
+                           
+                           ]
+
+    
     def __init__(self, browser):
         self.browser = browser
         if "/app/recs" not in self.browser.current_url:
             self._get_home_page()
 
+    def explore_like(self) -> bool:
+        like_button_path = '#s-547617529 > div > div.App__body.H\(100\%\).Pos\(r\).Z\(0\) > div > main > div.H\(100\%\) > div > div > div.Fx\(\$flx1\).Iso\(i\).Px\(8px\)--s.Py\(12px\)--s > div > div.Mt\(a\).Px\(4px\)--s.Pos\(r\).Expand.H\(--recs-card-height\)--ml.Maw\(--recs-card-width\)--ml > div > div > div.Pos\(a\).B\(0\).Iso\(i\).W\(100\%\).Start\(0\).End\(0\) > div > div.Mx\(a\).Fxs\(0\).Sq\(70px\).Sq\(60px\)--s.Bd.Bdrs\(50\%\).Bdc\(\$c-ds-border-gamepad-like-default\)'
+        WebDriverWait(self.browser, self.delay).until(EC.presence_of_element_located((By.CSS_SELECTOR, like_button_path)))  
+        like_button = self.browser.find_element(By.CSS_SELECTOR, like_button_path)
+        like_button.click()  
+        return True
+      
+
+
     def like(self) -> bool:
+        # self._get_home_page()
+        
         try:
             selector_path = '#s-547617529 > div > div.App__body.H\(100\%\).Pos\(r\).Z\(0\) > div > main > div.H\(100\%\) > div > div > div.Mt\(a\).Px\(4px\)--s.Pos\(r\).Expand.H\(--recs-card-height\)--ml.Maw\(--recs-card-width\)--ml > div.recsCardboard__cardsContainer.H\(100\%\).Pos\(r\).Z\(1\) > div > div.Pos\(a\).B\(0\).Iso\(i\).W\(100\%\).Start\(0\).End\(0\) > div > div.Mx\(a\).Fxs\(0\).Sq\(70px\).Sq\(60px\)--s.Bd.Bdrs\(50\%\).Bdc\(\$c-ds-border-gamepad-like-default\)'
-            # WebDriverWait(self.browser, self.delay).until(EC.presence_of_element_located((By.XPATH, xpath)))  
+
             WebDriverWait(self.browser, self.delay).until(EC.presence_of_element_located((By.CSS_SELECTOR, selector_path)))  
 
-            # like_button = self.browser.find_element(By.XPATH, xpath)
             like_button = self.browser.find_element(By.CSS_SELECTOR, selector_path)
             like_button.click()  
             # action = ActionChains(self.browser)
             # action.send_keys(Keys.ARROW_RIGHT).perform()
-
             # #time.sleep(1)
             return True
         
@@ -40,22 +77,15 @@ class GeomatchHelper:
             self._get_home_page()
         
         except TimeoutException:
-                print(f'{datetime.now()} - TimeoutException')
+            print(f'{datetime.now()} - TimeoutException')
 
-                try:
-                    self._get_home_page()
-                    WebDriverWait(self.browser, self.delay).until(EC.presence_of_element_located((By.CSS_SELECTOR, selector_path)))
-                except TimeoutException:
-                    print(f'Consecutive timeouts. Waiting 2 hours before trying again at {datetime.now()}')
-                    import random
-                    # Define random_location inline
-                    latitude, longitude = (random.uniform(-90, 90), random.uniform(-180, 180))
-
-                    self.browser.set_custom_location(latitude, longitude)
-                    print(f'Set random custom location: Latitude - {latitude}, Longitude - {longitude}')
-
-                    time.sleep(60 * 60 * 2)
-                    self._get_home_page()
+            try:
+                self._get_home_page()
+                WebDriverWait(self.browser, self.delay).until(EC.presence_of_element_located((By.CSS_SELECTOR, selector_path)))
+            except TimeoutException:
+                print(f'Consecutive timeouts. Waiting 2 hours before trying again at {datetime.now()}')
+                time.sleep(60 * 60 * 2)
+                self._get_home_page()
 
         except Exception as e:
             print(f'{datetime.now()} - Exception')
@@ -450,6 +480,10 @@ class GeomatchHelper:
 
     def _get_home_page(self):
         self.browser.get(self.HOME_URL)
+        time.sleep(5)
+    
+    def _get_explore_page(self):
+        self.browser.get(self.EXPLORE_URL)
         time.sleep(5)
 
     def _is_profile_opened(self):

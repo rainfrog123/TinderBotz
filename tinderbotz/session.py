@@ -228,46 +228,174 @@ class Session:
         longitude = random.uniform(-180, 180)
         return latitude, longitude    
 
-    def like(self, amount=1, ratio='72.5%', sleep=1, randomize_sleep = True):
+    # def like(self, amount=1, ratio='72.5%', sleep=1, randomize_sleep = True):
         
+    #     initial_sleep = sleep
+    #     ratio = float(ratio.split('%')[0]) / 100
+
+    #     if self._is_logged_in():
+    #         helper = GeomatchHelper(browser=self.browser)
+    #         amount_liked = 0
+    #         # handle one time up front, from then on check after every action instead of before
+    #         self._handle_potential_popups()
+    #         # time.sleep(10)
+    #         print("\nLiking profiles started.")
+
+    #         explore_available = False
+    #         explore_timer = 0  # Timer to switch explore_available every 2 hours
+    #         explore_interval = 2 * 60 * 60
+
+    #         while amount_liked < amount:
+    #             # first try explore like
+    #             if time.time() - explore_timer >= explore_interval:
+    #                 explore_available = True
+    #                 explore_timer = time.time()  # Reset the timer
+    #                 print("Explore available for the next 2 hours.")
+
+
+    #             if amount_liked % 50 == 0 and amount_liked > 0  :
+    #                 print(f"Sleeping for 20 minutes to avoid being banned...{self._print_liked_stats()}")
+    #                 time.sleep(1200)
+
+    #             if randomize_sleep:
+    #                 sleep = random.uniform(0.5, 2.3) * initial_sleep
+
+                
+    #             if explore_available:
+    #                 helper._get_explore_page()
+    #                 for like_card in helper.EXPLORE_LIKE_CARDS:
+    #                     css_selector  =  next(iter(like_card.values()))
+    #                     card = self.browser.find_element(By.CSS_SELECTOR, css_selector)
+    #                     card.click()
+    #                     while True:
+    #                         try:
+    #                             if random.random() <= ratio:
+    #                                 if helper.explore_like():
+    #                                     amount_liked += 1
+    #                                     # update for stats after session ended
+    #                                     self.session_data['like'] += 1
+    #                                     print(f"{amount_liked}/{amount} liked, sleep: {sleep}")
+    #                             else:
+    #                                 helper.dislike()
+    #                                 # update for stats after session ended
+    #                                 self.session_data['dislike'] += 1
+    #                             sleep = random.uniform(0.5, 2.3) * initial_sleep
+
+    #                             if amount_liked % 50 == 0 and amount_liked > 0  :
+    #                                 print(f"Sleeping for 20 minutes to avoid being banned...")
+    #                                 self._print_liked_stats()
+    #                                 helper._get_explore_page()
+    #                                 time.sleep(1200)
+    #                             #self._handle_potential_popups()
+    #                             time.sleep(sleep)
+                                
+    #                         except TimeoutException:
+    #                             print(f"TimeoutException, move to next card {like_card}")
+    #                             break
+    #                         except Exception as e:
+    #                             print(f"Exception {e}, move to next card {like_card}")
+    #                 explore_available = False
+                
+    #             else:
+    #                 if random.random() <= ratio:
+    #                     if helper.like():
+    #                         amount_liked += 1
+    #                         # update for stats after session ended
+    #                         self.session_data['like'] += 1
+    #                         print(f"{amount_liked}/{amount} liked, sleep: {sleep}")
+    #                 else:
+    #                     helper.dislike()
+    #                     # update for stats after session ended
+    #                     self.session_data['dislike'] += 1
+
+    #                 #self._handle_potential_popups()
+    #                 time.sleep(sleep)
+
+    #         self._print_liked_stats()
+    
+    def like(self, amount=1, ratio='72.5%', sleep=1, enable_random_sleep=True):
+
         initial_sleep = sleep
         ratio = float(ratio.split('%')[0]) / 100
 
-        if self._is_logged_in():
-            helper = GeomatchHelper(browser=self.browser)
-            amount_liked = 0
-            # handle one time up front, from then on check after every action instead of before
-            self._handle_potential_popups()
-            # time.sleep(10)
-            print("\nLiking profiles started.")
-            while amount_liked < amount:
-                if amount_liked % 50 == 0 and amount_liked > 0  :
-                    print(f"Sleeping for 20 minutes to avoid being banned...{self._print_liked_stats()}")
-                    time.sleep(1200)
+        if not self._is_logged_in():
+            return  # Exit if not logged in
 
-                # if amount_liked % 60 == 0:
-                #     new_location = self.random_location()
-                #     self.set_custom_location(*new_location)
-                #     print(f'New location: {new_location}')
+        helper = GeomatchHelper(browser=self.browser)
+        liked_count = 0
+        self._handle_potential_popups()
+        print("\nLiking profiles started.")
 
-                if randomize_sleep:
-                    sleep = random.uniform(0.5, 2.3) * initial_sleep
-                
+        explore_available = False
+        explore_timer = 0  # Timer to switch explore_available every 2 hours
+        explore_interval = 2 * 60 * 60
+
+        while liked_count < amount:
+            if time.time() - explore_timer >= explore_interval:
+                explore_available = True
+                explore_timer = time.time()  # Reset the timer
+                print("Explore available for the next 2 hours.")
+
+            if liked_count % 50 == 0 and liked_count > 0:
+                print(f"Sleeping for 20 minutes to avoid being banned...Nomal Mode")
+                self._print_liked_stats()
+                # helper._get_explore_page()
+                time.sleep(1200)
+
+            if enable_random_sleep:
+                sleep_duration = random.uniform(0.5, 2.3) * initial_sleep
+
+            if explore_available:
+                helper._get_explore_page()
+                for card_info in helper.EXPLORE_LIKE_CARDS:
+                    css_selector = list(card_info.values())[0]
+                    card = self.browser.find_element(By.CSS_SELECTOR, css_selector)
+                    card.click()
+                    while True:
+                        try:
+                            if random.random() <= ratio:
+                                if helper.explore_like():
+                                    liked_count += 1
+                                    # update for stats after session ended
+                                    self.session_data['like'] += 1
+                                    print(f"{liked_count}/{amount} liked, sleep: {sleep_duration}")
+                            else:
+                                helper.dislike()
+                            sleep_duration = random.uniform(0.5, 2.3) * initial_sleep
+
+                            if liked_count % 50 == 0 and liked_count > 0:
+                                print(f"Sleeping for 20 minutes to avoid being banned...Explore Mode")
+                                self._print_liked_stats()
+                                time.sleep(1200)
+                            # self._handle_potential_popups()
+                            time.sleep(sleep_duration)
+
+                            # if liked_count % 3 == 0 and liked_count > 0:
+                            #     raise TimeoutException('Manully raised TimeoutException')
+
+                        except TimeoutException:
+                            print(f"TimeoutException, move to next card from {list(card_info.keys())[0]}")
+                            break
+                        except Exception as e:
+                            print(f"Exception {e}, move to next card from {list(card_info.keys())[0]}")
+                explore_available = False
+
+            else:
                 if random.random() <= ratio:
                     if helper.like():
-                        amount_liked += 1
+                        liked_count += 1
                         # update for stats after session ended
                         self.session_data['like'] += 1
-                        print(f"{amount_liked}/{amount} liked, sleep: {sleep}")
+                        print(f"{liked_count}/{amount} liked, sleep: {sleep_duration}")
                 else:
                     helper.dislike()
-                    # update for stats after session ended
-                    self.session_data['dislike'] += 1
 
-                #self._handle_potential_popups()
-                time.sleep(sleep)
+                # self._handle_potential_popups()
+                time.sleep(sleep_duration)
 
-            self._print_liked_stats()
+        self._print_liked_stats()
+
+
 
     def dislike(self, amount=1):
         if self._is_logged_in():
@@ -525,4 +653,3 @@ class Session:
             print(f"You've liked {self.session_data['like']} profiles during this session.")
         if dislikes > 0:
             print(f"You've disliked {self.session_data['dislike']} profiles during this session.")
-
