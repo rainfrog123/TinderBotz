@@ -221,6 +221,13 @@ class Session:
         # store its userdata
         StorageHelper.store_match(match=match, directory='data/{}'.format(filename), filename=filename)
 
+
+    def random_location(self):
+        import random
+        latitude = random.uniform(-90, 90)
+        longitude = random.uniform(-180, 180)
+        return latitude, longitude    
+
     def like(self, amount=1, ratio='72.5%', sleep=1, randomize_sleep = True):
         
         initial_sleep = sleep
@@ -234,11 +241,15 @@ class Session:
             # time.sleep(10)
             print("\nLiking profiles started.")
             while amount_liked < amount:
-                # randomize sleep
-                if amount_liked % 50 == 0 and amount_liked > 0:
-                    print("Sleeping for 40 minutes to avoid being banned...")
-                    time.sleep(2400)
-                    
+                if amount_liked % 50 == 0 and amount_liked > 0  :
+                    print(f"Sleeping for 20 minutes to avoid being banned...{self._print_liked_stats()}")
+                    time.sleep(1200)
+
+                # if amount_liked % 60 == 0:
+                #     new_location = self.random_location()
+                #     self.set_custom_location(*new_location)
+                #     print(f'New location: {new_location}')
+
                 if randomize_sleep:
                     sleep = random.uniform(0.5, 2.3) * initial_sleep
                 
