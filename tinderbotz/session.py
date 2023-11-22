@@ -5,7 +5,7 @@ import undetected_chromedriver as uc
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import NoSuchElementException, TimeoutException, ElementNotVisibleException
+from selenium.common.exceptions import NoSuchElementException, TimeoutException, ElementNotVisibleException, ElementClickInterceptedException
 from selenium.webdriver.common.by import By
 
 
@@ -347,10 +347,21 @@ class Session:
 
             if explore_available:
                 helper._get_explore_page()
+                time.sleep(5)
+                print(f'Right now we begin at {helper.EXPLORE_LIKE_CARDS[0]} card')
+                # self._handle_potential_popups()
+
                 for card_info in helper.EXPLORE_LIKE_CARDS:
-                    css_selector = list(card_info.values())[0]
-                    card = self.browser.find_element(By.CSS_SELECTOR, css_selector)
-                    card.click()
+                    try:
+                        css_selector = list(card_info.values())[0]
+                        card = self.browser.find_element(By.CSS_SELECTOR, css_selector)
+                        card.click()
+                    except Exception as e:
+                        print(f"Exception {e} in select {list(card_info.keys())[0]}")
+                        self._handle_potential_popups()
+
+                        # helper._get_explore_page()
+
                     while True:
                         try:
                             if random.random() <= ratio:
@@ -358,7 +369,7 @@ class Session:
                                     liked_count += 1
                                     # update for stats after session ended
                                     self.session_data['like'] += 1
-                                    print(f"{liked_count}/{amount} liked, sleep: {sleep_duration}")
+                                    print(f"{liked_count}/{amount} liked, sleep: {sleep_duration}, time: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())}")
                             else:
                                 helper.dislike()
                                 # update for stats after session ended
@@ -366,10 +377,12 @@ class Session:
 
                             sleep_duration = random.uniform(0.5, 2.3) * initial_sleep
 
-                            if liked_count % 50 == 0 and liked_count > 0:
-                                print(f"Sleeping for 20 minutes to avoid being banned...Explore Mode")
+                            if liked_count % 66 == 0 and liked_count > 0:
+                                print(f"Sleeping for 10 minutes to avoid being banned...Explore Mode")
                                 self._print_liked_stats()
-                                time.sleep(1200)
+                                print(f'Right now we are at {list(card_info.keys())[0]} card')
+                                print(f'start: {self.started}, end: {time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}')
+                                time.sleep(600)
                             # self._handle_potential_popups()
                             time.sleep(sleep_duration)
 
@@ -379,9 +392,17 @@ class Session:
                         except TimeoutException:
                             print(f"Timeout_Exception, move to next card from {list(card_info.keys())[0]}")
                             break
-                        except Exception as e:
-                            print(f"Exception {e}, move to next card from {list(card_info.keys())[0]}")
+                        
+                        except ElementClickInterceptedException:
+                            print(f"Exception {e} happend in {list(card_info.keys())[0]}, retrying...")
+                            self._handle_potential_popups()
                             helper._get_explore_page()
+
+                        except Exception as e:
+                            print(f"Exception {e} happend in {list(card_info.keys())[0]}, retrying...")
+                            break
+
+
                 explore_available = False
 
             else:

@@ -83,8 +83,8 @@ class GeomatchHelper:
                 self._get_home_page()
                 WebDriverWait(self.browser, self.delay).until(EC.presence_of_element_located((By.CSS_SELECTOR, selector_path)))
             except TimeoutException:
-                print(f'Consecutive timeouts. Waiting 2 hours before trying again at {datetime.now()}')
-                time.sleep(60 * 60 * 2)
+                print(f'Consecutive timeouts. Waiting 1 hour before trying again at {datetime.now()}')
+                time.sleep(60 * 60 * 1)
                 self._get_home_page()
 
         except Exception as e:

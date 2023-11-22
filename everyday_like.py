@@ -1,16 +1,16 @@
-'''
-Created by Frederikme (TeetiFM)
-'''
-
 from tinderbotz.session import Session
 from tinderbotz.helpers.constants_helper import *
 
 if __name__ == "__main__":
-    session = Session()
+    while True:
+        try:
+            # Create a new session
+            session = Session()
 
-    # session.set_custom_location(random_location()[0], random_location()[1])
-    
-    # session.set_custom_location(latitude=50.879829, longitude=4.700540)
+            # Perform the 'like' action with specified parameters
+            session.like(amount=5000000, ratio="95%", sleep=5)
 
-    session.like(amount=5000000, ratio="90%", sleep=5)
+        except Exception as e:
+            # Print the exception details
+            print(f"An exception occurred: {e}")
 
