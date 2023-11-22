@@ -361,6 +361,9 @@ class Session:
                                     print(f"{liked_count}/{amount} liked, sleep: {sleep_duration}")
                             else:
                                 helper.dislike()
+                                # update for stats after session ended
+                                self.session_data['dislike'] += 1
+
                             sleep_duration = random.uniform(0.5, 2.3) * initial_sleep
 
                             if liked_count % 50 == 0 and liked_count > 0:
@@ -374,10 +377,11 @@ class Session:
                             #     raise TimeoutException('Manully raised TimeoutException')
 
                         except TimeoutException:
-                            print(f"TimeoutException, move to next card from {list(card_info.keys())[0]}")
+                            print(f"Timeout_Exception, move to next card from {list(card_info.keys())[0]}")
                             break
                         except Exception as e:
                             print(f"Exception {e}, move to next card from {list(card_info.keys())[0]}")
+                            helper._get_explore_page()
                 explore_available = False
 
             else:
@@ -389,11 +393,15 @@ class Session:
                         print(f"{liked_count}/{amount} liked, sleep: {sleep_duration}")
                 else:
                     helper.dislike()
+                    # update for stats after session ended
+                    self.session_data['dislike'] += 1
 
                 # self._handle_potential_popups()
                 time.sleep(sleep_duration)
 
         self._print_liked_stats()
+        print("Liking profiles ended.")
+        print(f'start: {self.started}, end: {time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}')
 
 
 
