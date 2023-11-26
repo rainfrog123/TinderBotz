@@ -345,62 +345,56 @@ class Session:
             if enable_random_sleep:
                 sleep_duration = random.uniform(0.5, 2.3) * initial_sleep
 
-            if explore_available:
+            while explore_available:
                 helper._get_explore_page()
                 time.sleep(5)
-                print(f'Right now we begin at {helper.EXPLORE_LIKE_CARDS[0]} card')
-                # self._handle_potential_popups()
 
                 for card_info in helper.EXPLORE_LIKE_CARDS:
+                    print(f'Right now we are at {list(card_info.keys())[0]} card, time: {time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}')
                     try:
                         css_selector = list(card_info.values())[0]
                         card = self.browser.find_element(By.CSS_SELECTOR, css_selector)
                         card.click()
+
+                        while True:
+                            try:
+                                if random.random() <= ratio:
+                                    if helper.explore_like():
+                                        liked_count += 1
+                                        self.session_data['like'] += 1
+                                        print(f"{liked_count}/{amount} liked, sleep: {sleep_duration}, time: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())}")
+                                else:
+                                    helper.dislike()
+                                    self.session_data['dislike'] += 1
+
+                                sleep_duration = random.uniform(0.5, 2.3) * initial_sleep
+
+                                if liked_count % 66 == 0 and liked_count > 0:
+                                    print(f"Sleeping for 10 minutes to avoid being banned...Explore Mode")
+                                    self._print_liked_stats()
+                                    print(f'Right now we are at {list(card_info.keys())[0]} card')
+                                    print(f'start: , end: {time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}')
+                                    time.sleep(600)
+
+                                time.sleep(sleep_duration)
+                            
+
+                            except TimeoutException as te:
+                                print(f"{te.__class__.__name__}, move to the next card from {list(card_info.keys())[0]}")
+                                break
+
+                            except ElementClickInterceptedException as e:
+                                print(f"Exception {e} happened in {list(card_info.keys())[0]}, retrying...")
+                                self._handle_potential_popups()
+                                helper._get_explore_page()
+
+                    except NoSuchElementException as nse:
+                                print(f"{nse.__class__.__name__}, move to the next card from {list(card_info.keys())[0]}")
+                                continue                
+
                     except Exception as e:
-                        print(f"Exception {e} in select {list(card_info.keys())[0]}")
-                        self._handle_potential_popups()
-
-                        # helper._get_explore_page()
-
-                    while True:
-                        try:
-                            if random.random() <= ratio:
-                                if helper.explore_like():
-                                    liked_count += 1
-                                    # update for stats after session ended
-                                    self.session_data['like'] += 1
-                                    print(f"{liked_count}/{amount} liked, sleep: {sleep_duration}, time: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())}")
-                            else:
-                                helper.dislike()
-                                # update for stats after session ended
-                                self.session_data['dislike'] += 1
-
-                            sleep_duration = random.uniform(0.5, 2.3) * initial_sleep
-
-                            if liked_count % 66 == 0 and liked_count > 0:
-                                print(f"Sleeping for 10 minutes to avoid being banned...Explore Mode")
-                                self._print_liked_stats()
-                                print(f'Right now we are at {list(card_info.keys())[0]} card')
-                                print(f'start: {self.started}, end: {time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}')
-                                time.sleep(600)
-                            # self._handle_potential_popups()
-                            time.sleep(sleep_duration)
-
-                            # if liked_count % 3 == 0 and liked_count > 0:
-                            #     raise TimeoutException('Manully raised TimeoutException')
-
-                        except TimeoutException:
-                            print(f"Timeout_Exception, move to next card from {list(card_info.keys())[0]}")
-                            break
-                        
-                        except ElementClickInterceptedException:
-                            print(f"Exception {e} happend in {list(card_info.keys())[0]}, retrying...")
-                            self._handle_potential_popups()
-                            helper._get_explore_page()
-
-                        except Exception as e:
-                            print(f"Exception {e} happend in {list(card_info.keys())[0]}, retrying...")
-                            break
+                        print(f"Exception {e} happened in {list(card_info.keys())[0]}, retrying...")
+                        break  
 
 
                 explore_available = False
@@ -422,7 +416,7 @@ class Session:
 
         self._print_liked_stats()
         print("Liking profiles ended.")
-        print(f'start: {self.started}, end: {time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}')
+        print(f'start: , end: {time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}')
 
 
 
